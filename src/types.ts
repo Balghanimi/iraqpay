@@ -32,7 +32,19 @@ export interface NassPayConfig {
 }
 
 export interface CODConfig {
-  /** No credentials needed — COD is tracking-only */
+  /** Optional storage adapter for COD order persistence. Defaults to in-memory Map. */
+  store?: CODStore;
+}
+
+/** Pluggable storage for COD orders. Implement this to persist orders to your database. */
+export interface CODStore {
+  get(id: string): Promise<CODOrderData | undefined>;
+  set(id: string, data: CODOrderData): Promise<void>;
+}
+
+export interface CODOrderData {
+  status: PaymentStatus;
+  params: CreatePaymentParams;
 }
 
 export interface GatewayConfigs {
@@ -145,8 +157,8 @@ export interface PaymentGateway {
 
   createPayment(params: CreatePaymentParams): Promise<PaymentResult>;
   getStatus(paymentId: string): Promise<PaymentStatusResult>;
-  cancel(paymentId: string): Promise<boolean>;
-  refund(paymentId: string): Promise<boolean>;
+  cancel(paymentId: string, amount?: number): Promise<boolean>;
+  refund(paymentId: string, amount?: number): Promise<boolean>;
   verifyCallback(payload: unknown): Promise<WebhookEvent>;
 }
 

@@ -80,7 +80,7 @@ export class IraqPay {
     }
 
     if (config.gateways.cod) {
-      this.gateways.set('cod', new CODGateway());
+      this.gateways.set('cod', new CODGateway(config.gateways.cod));
     }
   }
 
@@ -149,23 +149,25 @@ export class IraqPay {
   /**
    * Cancel a pending payment
    *
+   * @param amount - Optional amount for partial cancellation (QiCard). Omit for full cancel.
    * @returns true if cancelled successfully
    * @throws IraqPayError if gateway doesn't support cancellation
    */
-  async cancel(paymentId: string, gateway?: GatewayName): Promise<boolean> {
+  async cancel(paymentId: string, gateway?: GatewayName, amount?: number): Promise<boolean> {
     const gw = this.resolveGateway(gateway);
-    return gw.cancel(paymentId);
+    return gw.cancel(paymentId, amount);
   }
 
   /**
    * Refund a completed payment
    *
+   * @param amount - Optional amount for partial refund (QiCard, FIB). Omit for full refund.
    * @returns true if refund initiated successfully
    * @throws IraqPayError if gateway doesn't support refunds (ZainCash, NassPay)
    */
-  async refund(paymentId: string, gateway?: GatewayName): Promise<boolean> {
+  async refund(paymentId: string, gateway?: GatewayName, amount?: number): Promise<boolean> {
     const gw = this.resolveGateway(gateway);
-    return gw.refund(paymentId);
+    return gw.refund(paymentId, amount);
   }
 
   /**

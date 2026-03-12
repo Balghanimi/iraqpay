@@ -38,6 +38,7 @@ export class NassPayGateway implements PaymentGateway {
   readonly name = 'nasspay' as const;
   private baseUrl: string;
   private accessToken: string | null = null;
+  private tokenExpiresAt: number = 0;
   private http: AxiosInstance | null = null;
 
   constructor(
@@ -67,6 +68,9 @@ export class NassPayGateway implements PaymentGateway {
     }
 
     this.accessToken = data.access_token;
+    // Cache token with conservative 50-minute TTL (most tokens last 1-24h)
+    const ttlMs = (data.expires_in ?? 3600) * 1000;
+    this.tokenExpiresAt = Date.now() + ttlMs - 10 * 60 * 1000; // refresh 10 min early
     this.http = axios.create({
       baseURL: this.baseUrl,
       headers: {
@@ -76,15 +80,35 @@ export class NassPayGateway implements PaymentGateway {
     });
   }
 
+  private isTokenExpired(): boolean {
+    return !this.http || Date.now() >= this.tokenExpiresAt;
+  }
+
   private async ensureAuth(): Promise<AxiosInstance> {
-    if (!this.http) {
+    if (this.isTokenExpired()) {
       await this.authenticate();
     }
     return this.http!;
   }
 
-  async createPayment(params: CreatePaymentParams): Promise<PaymentResult> {
+  /** Re-authenticate and retry once on 401 */
+  private async withRetry<T>(fn: (http: AxiosInstance) => Promise<T>): Promise<T> {
     const http = await this.ensureAuth();
+    try {
+      return await fn(http);
+    } catch (err: unknown) {
+      const status = (err as { response?: { status?: number } })?.response?.status;
+      if (status === 401) {
+        // Token expired server-side — force re-auth and retry once
+        this.http = null;
+        const freshHttp = await this.ensureAuth();
+        return fn(freshHttp);
+      }
+      throw err;
+    }
+  }
+
+  async createPayment(params: CreatePaymentParams): Promise<PaymentResult> {
     const currencyCode =
       CURRENCY_CODES[params.currency || 'IQD'] || CURRENCY_CODES.IQD;
 
@@ -100,8 +124,10 @@ export class NassPayGateway implements PaymentGateway {
 
     let data: Record<string, unknown>;
     try {
-      const response = await http.post('/transaction', body);
-      data = response.data;
+      data = await this.withRetry(async (http) => {
+        const response = await http.post('/transaction', body);
+        return response.data;
+      });
     } catch (err: unknown) {
       const message =
         err instanceof Error
@@ -125,11 +151,10 @@ export class NassPayGateway implements PaymentGateway {
   }
 
   async getStatus(orderId: string): Promise<PaymentStatusResult> {
-    const http = await this.ensureAuth();
-
-    const { data } = await http.get(
-      `/transaction/${orderId}/checkStatus`,
-    );
+    const data = await this.withRetry(async (http) => {
+      const response = await http.get(`/transaction/${orderId}/checkStatus`);
+      return response.data;
+    });
 
     return {
       id: orderId,
@@ -139,7 +164,7 @@ export class NassPayGateway implements PaymentGateway {
     };
   }
 
-  async cancel(_paymentId: string): Promise<boolean> {
+  async cancel(_paymentId: string, _amount?: number): Promise<boolean> {
     throw new IraqPayError(
       'NassPay cancel is not supported via SDK',
       'nasspay',
@@ -147,7 +172,7 @@ export class NassPayGateway implements PaymentGateway {
     );
   }
 
-  async refund(_paymentId: string): Promise<boolean> {
+  async refund(_paymentId: string, _amount?: number): Promise<boolean> {
     throw new IraqPayError(
       'NassPay refund is not documented. Contact NassPay support.',
       'nasspay',

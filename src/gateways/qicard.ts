@@ -102,11 +102,11 @@ export class QiCardGateway implements PaymentGateway {
     };
   }
 
-  async cancel(paymentId: string): Promise<boolean> {
+  async cancel(paymentId: string, amount?: number): Promise<boolean> {
     try {
       const { status } = await this.http.post(`/payment/${paymentId}/cancel`, {
         requestId: paymentId,
-        amount: 0,
+        ...(amount != null && { amount }),
       });
       return status >= 200 && status < 300;
     } catch {
@@ -114,11 +114,11 @@ export class QiCardGateway implements PaymentGateway {
     }
   }
 
-  async refund(paymentId: string): Promise<boolean> {
+  async refund(paymentId: string, amount?: number): Promise<boolean> {
     try {
       const { status } = await this.http.post(`/payment/${paymentId}/refund`, {
         requestId: paymentId,
-        amount: 0,
+        ...(amount != null && { amount }),
       });
       return status >= 200 && status < 300;
     } catch {

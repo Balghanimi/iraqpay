@@ -183,7 +183,7 @@ export class FIBGateway implements PaymentGateway {
     };
   }
 
-  async cancel(paymentId: string): Promise<boolean> {
+  async cancel(paymentId: string, _amount?: number): Promise<boolean> {
     const http = await this.ensureAuth();
 
     try {
@@ -194,7 +194,7 @@ export class FIBGateway implements PaymentGateway {
     }
   }
 
-  async refund(paymentId: string): Promise<boolean> {
+  async refund(paymentId: string, _amount?: number): Promise<boolean> {
     const http = await this.ensureAuth();
 
     try {

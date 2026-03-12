@@ -7,8 +7,8 @@
  * @example
  * ```typescript
  * import express from 'express';
- * import { IraqPay } from '@iraqpay/sdk';
- * import { createWebhookHandler, createCheckoutHandler } from '@iraqpay/sdk/middleware/express';
+ * import { IraqPay } from 'iraqpay';
+ * import { createWebhookHandler, createCheckoutHandler } from 'iraqpay';
  *
  * const app = express();
  * const pay = new IraqPay({ ... });

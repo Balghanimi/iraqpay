@@ -1,11 +1,11 @@
 /**
- * @iraqpay/sdk — Unified Payment SDK for Iraq
+ * IraqPay — Unified Payment SDK for Iraq
  *
  * One SDK for ZainCash, FIB, QiCard, NassPay, and Cash-on-Delivery
  *
  * @example
  * ```typescript
- * import { IraqPay } from '@iraqpay/sdk';
+ * import { IraqPay } from 'iraqpay';
  *
  * const pay = new IraqPay({
  *   gateways: {
@@ -38,6 +38,8 @@ export type {
   QiCardConfig,
   NassPayConfig,
   CODConfig,
+  CODStore,
+  CODOrderData,
   Currency,
   CreatePaymentParams,
   CustomerInfo,

@@ -3,6 +3,9 @@
  *
  * Not a real payment gateway — provides a unified tracking interface
  * for COD orders so that apps can handle all payment types with one API.
+ *
+ * Accepts an optional CODStore adapter for persistent storage.
+ * Defaults to in-memory Map (fine for testing, not for production).
  */
 
 import {
@@ -12,21 +15,36 @@ import {
   PaymentStatusResult,
   WebhookEvent,
   IraqPayError,
+  CODConfig,
+  CODStore,
+  CODOrderData,
 } from '../types';
 
-// In-memory store (replace with your own persistence)
-const codOrders = new Map<
-  string,
-  { status: PaymentResult['status']; params: CreatePaymentParams }
->();
+/** Default in-memory store — data lost on restart */
+class InMemoryStore implements CODStore {
+  private map = new Map<string, CODOrderData>();
+
+  async get(id: string): Promise<CODOrderData | undefined> {
+    return this.map.get(id);
+  }
+
+  async set(id: string, data: CODOrderData): Promise<void> {
+    this.map.set(id, data);
+  }
+}
 
 export class CODGateway implements PaymentGateway {
   readonly name = 'cod' as const;
+  private store: CODStore;
+
+  constructor(config?: CODConfig) {
+    this.store = config?.store ?? new InMemoryStore();
+  }
 
   async createPayment(params: CreatePaymentParams): Promise<PaymentResult> {
     const id = `cod_${params.orderId}`;
 
-    codOrders.set(id, { status: 'pending', params });
+    await this.store.set(id, { status: 'pending', params });
 
     return {
       id,
@@ -40,7 +58,7 @@ export class CODGateway implements PaymentGateway {
   }
 
   async getStatus(paymentId: string): Promise<PaymentStatusResult> {
-    const order = codOrders.get(paymentId);
+    const order = await this.store.get(paymentId);
 
     return {
       id: paymentId,
@@ -52,24 +70,26 @@ export class CODGateway implements PaymentGateway {
 
   /** Mark COD as collected by delivery driver */
   async markPaid(paymentId: string): Promise<boolean> {
-    const order = codOrders.get(paymentId);
+    const order = await this.store.get(paymentId);
     if (order) {
       order.status = 'paid';
+      await this.store.set(paymentId, order);
       return true;
     }
     return false;
   }
 
-  async cancel(paymentId: string): Promise<boolean> {
-    const order = codOrders.get(paymentId);
+  async cancel(paymentId: string, _amount?: number): Promise<boolean> {
+    const order = await this.store.get(paymentId);
     if (order) {
       order.status = 'cancelled';
+      await this.store.set(paymentId, order);
       return true;
     }
     return false;
   }
 
-  async refund(_paymentId: string): Promise<boolean> {
+  async refund(_paymentId: string, _amount?: number): Promise<boolean> {
     throw new IraqPayError(
       'COD refunds are handled manually',
       'cod',

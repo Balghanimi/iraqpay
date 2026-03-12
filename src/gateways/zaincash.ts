@@ -136,7 +136,7 @@ export class ZainCashGateway implements PaymentGateway {
     };
   }
 
-  async cancel(_paymentId: string): Promise<boolean> {
+  async cancel(_paymentId: string, _amount?: number): Promise<boolean> {
     // ZainCash cancel is available but undocumented
     // For now, throw a descriptive error
     throw new IraqPayError(
@@ -146,7 +146,7 @@ export class ZainCashGateway implements PaymentGateway {
     );
   }
 
-  async refund(_paymentId: string): Promise<boolean> {
+  async refund(_paymentId: string, _amount?: number): Promise<boolean> {
     throw new IraqPayError(
       'ZainCash does not have a refund API. Contact ZainCash support for manual refunds.',
       'zaincash',

@@ -13,13 +13,13 @@ One SDK for **all** Iraqi payment gateways. Stop writing separate integrations f
 ## Install
 
 ```bash
-npm install @iraqpay/sdk
+npm install iraqpay
 ```
 
 ## Quick Start
 
 ```typescript
-import { IraqPay } from '@iraqpay/sdk';
+import { IraqPay } from 'iraqpay';
 
 const pay = new IraqPay({
   gateways: {
@@ -247,7 +247,7 @@ await pay.createPayment({ gateway: 'zaincash', amount: 5000, orderId: 'zc_002' }
 ## Error Handling
 
 ```typescript
-import { IraqPayError, GatewayNotConfiguredError, PaymentFailedError } from '@iraqpay/sdk';
+import { IraqPayError, GatewayNotConfiguredError, PaymentFailedError } from 'iraqpay';
 
 try {
   await pay.createPayment({ gateway: 'zaincash', amount: 100, orderId: 'test' });
