@@ -61,3 +61,13 @@ export { FIBGateway } from './gateways/fib';
 export { QiCardGateway } from './gateways/qicard';
 export { NassPayGateway } from './gateways/nasspay';
 export { CODGateway } from './gateways/cod';
+
+// Express.js middleware
+export {
+  createWebhookHandler,
+  createCheckoutHandler,
+} from './middleware/express';
+export type {
+  WebhookHandlerOptions,
+  CheckoutHandlerOptions,
+} from './middleware/express';
