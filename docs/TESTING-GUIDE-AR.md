@@ -30,22 +30,38 @@ npm test          # يشغّل 28 تست (لازم كلهم ينجحون)
 
 ---
 
-## 2. شغّل سيرفر المثال
+## 2. تجربة سريعة (بدون سيرفر)
 
-IraqPay يجي وياه سيرفر Express جاهز:
+أسرع طريقة تتأكد كلشي يشتغل:
 
 </div>
 
 ```bash
-npx ts-node examples/express-server.ts
+node examples/test-local.js
+```
+
+<div dir="rtl">
+
+راح تشوف 4 فحوصات تنجح: دفعة زين كاش، فحص حالة، دورة COD، معالجة أخطاء.
+
+## 3. شغّل سيرفر المثال
+
+</div>
+
+```bash
+# نصّب Express أول (مرة وحدة)
+npm install express --no-save
+
+# شغّل السيرفر
+node examples/server.js
 ```
 
 <div dir="rtl">
 
 راح تشوف:
 ```
-IraqPay example server running on http://localhost:3000
-Configured gateways: zaincash, cod
+IraqPay server: http://localhost:3000
+Gateways: zaincash, cod
 ```
 
 ### جرّب زين كاش (ساندبوكس — يشتغل فوراً بدون أي إعدادات)
@@ -95,7 +111,7 @@ curl -X POST http://localhost:3000/api/checkout \
 
 ---
 
-## 3. استخدم IraqPay بمشروعك (بدون نشر على npm)
+## 4. استخدم IraqPay بمشروعك (بدون نشر على npm)
 
 </div>
 
@@ -129,7 +145,7 @@ npm install D:/iraqpay
 
 ---
 
-## 4. جرّب مع أكل بيت (تكامل كامل)
+## 5. جرّب مع أكل بيت (تكامل كامل)
 
 ### شغّل الباكند
 
@@ -172,7 +188,7 @@ npm run dev
 
 ---
 
-## 5. بيانات الساندبوكس لكل بوابة
+## 6. بيانات الساندبوكس لكل بوابة
 
 ### زين كاش (مدمجة — ما تحتاج أي إعداد)
 
@@ -220,7 +236,7 @@ npm run dev
 
 ---
 
-## 6. شغّل الفحوصات
+## 7. شغّل الفحوصات
 
 </div>
 
@@ -240,7 +256,7 @@ ZAINCASH_LIVE=1 npm test
 
 ---
 
-## 7. تجربة الويبهوكات محلياً
+## 8. تجربة الويبهوكات محلياً
 
 بوابات الدفع ترسل webhooks لسيرفرك. للتجربة المحلية، استخدم [ngrok](https://ngrok.com/):
 
@@ -266,7 +282,7 @@ BACKEND_URL=https://abc123.ngrok.io
 
 ---
 
-## 8. حل المشاكل الشائعة
+## 9. حل المشاكل الشائعة
 
 | المشكلة | الحل |
 |---------|------|

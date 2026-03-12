@@ -24,19 +24,30 @@ npm test          # runs 28 tests (should all pass)
 
 ---
 
-## 2. Run the Example Server
+## 2. Quick Test (No Server Needed)
 
-IraqPay ships with a ready-to-run Express server:
+The fastest way to verify everything works:
 
 ```bash
-# From the iraqpay directory
-npx ts-node examples/express-server.ts
+node examples/test-local.js
+```
+
+You'll see 4 tests run and pass: ZainCash payment, status check, COD flow, error handling.
+
+## 3. Run the Example Server
+
+```bash
+# Install Express first (one-time)
+npm install express --no-save
+
+# Start the server
+node examples/server.js
 ```
 
 You'll see:
 ```
-IraqPay example server running on http://localhost:3000
-Configured gateways: zaincash, cod
+IraqPay server: http://localhost:3000
+Gateways: zaincash, cod
 ```
 
 ### Test ZainCash (sandbox — works immediately, no credentials needed)
@@ -90,7 +101,7 @@ curl http://localhost:3000/api/payment/zaincash/69b28.../status
 
 ---
 
-## 3. Test Inside Your Own Project (npm link)
+## 4. Test Inside Your Own Project (npm link)
 
 To use IraqPay in another local project (like Akel Bait) without publishing to npm:
 
@@ -118,7 +129,7 @@ npm install D:/iraqpay
 
 ---
 
-## 4. Test with Akel Bait (Full Integration)
+## 5. Test with Akel Bait (Full Integration)
 
 ### Start the backend
 
@@ -153,7 +164,7 @@ npm run dev
 
 ---
 
-## 5. Gateway Sandbox Credentials
+## 6. Gateway Sandbox Credentials
 
 ### ZainCash (built-in — no setup needed)
 
@@ -201,7 +212,7 @@ These are ZainCash's **official** sandbox credentials from their docs.
 
 ---
 
-## 6. Run the Test Suite
+## 7. Run the Test Suite
 
 ```bash
 cd D:/iraqpay
@@ -217,7 +228,7 @@ All 28 tests should pass. The live test creates a real sandbox payment on ZainCa
 
 ---
 
-## 7. Verify Webhooks Locally
+## 8. Verify Webhooks Locally
 
 Payment gateways send webhooks to your server. For local testing, use [ngrok](https://ngrok.com/):
 
@@ -239,7 +250,7 @@ Now gateway webhooks will reach your local server.
 
 ---
 
-## 8. Troubleshooting
+## 9. Troubleshooting
 
 | Problem | Solution |
 |---------|----------|
