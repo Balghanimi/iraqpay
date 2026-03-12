@@ -293,6 +293,11 @@ MIT
 
 Pull requests welcome. For major changes, please open an issue first.
 
+## Docs
+
+- [Testing Guide (English)](docs/TESTING-GUIDE.md) — how to test locally
+- [دليل التجربة (عربي)](docs/TESTING-GUIDE-AR.md) — شلون تجرّب محلياً
+
 ## Links
 
 - [GitHub](https://github.com/Balghanimi/iraqpay)
