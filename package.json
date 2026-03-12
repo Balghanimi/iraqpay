@@ -1,5 +1,5 @@
 {
-  "name": "@iraqpay/sdk",
+  "name": "iraqpay",
   "version": "0.1.0",
   "description": "Unified payment SDK for all Iraqi payment gateways — ZainCash, FIB, QiCard, NassPay, and more",
   "main": "dist/index.js",
