@@ -49,34 +49,35 @@ export class IraqPay {
   constructor(private config: IraqPayConfig) {
     const sandbox = config.sandbox ?? true;
     const lang = config.language || 'ar';
+    const timeout = config.timeout ?? 30000;
     this.defaultGateway = config.defaultGateway;
 
     // Initialize configured gateways
     if (config.gateways.zaincash) {
       this.gateways.set(
         'zaincash',
-        new ZainCashGateway(config.gateways.zaincash, sandbox, lang),
+        new ZainCashGateway(config.gateways.zaincash, sandbox, lang, timeout),
       );
     }
 
     if (config.gateways.fib) {
       this.gateways.set(
         'fib',
-        new FIBGateway(config.gateways.fib, sandbox),
+        new FIBGateway(config.gateways.fib, sandbox, timeout),
       );
     }
 
     if (config.gateways.qicard) {
       this.gateways.set(
         'qicard',
-        new QiCardGateway(config.gateways.qicard, sandbox),
+        new QiCardGateway(config.gateways.qicard, sandbox, timeout),
       );
     }
 
     if (config.gateways.nasspay) {
       this.gateways.set(
         'nasspay',
-        new NassPayGateway(config.gateways.nasspay, sandbox),
+        new NassPayGateway(config.gateways.nasspay, sandbox, timeout),
       );
     }
 

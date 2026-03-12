@@ -39,11 +39,15 @@ export class FIBGateway implements PaymentGateway {
   private refreshToken: string | null = null;
   private http: AxiosInstance | null = null;
 
+  private timeout: number;
+
   constructor(
     private config: FIBConfig,
     private sandbox: boolean = true,
+    timeout: number = 30000,
   ) {
     this.urls = sandbox ? URLS.sandbox : URLS.production;
+    this.timeout = timeout;
   }
 
   private async authenticate(): Promise<void> {
@@ -55,6 +59,7 @@ export class FIBGateway implements PaymentGateway {
 
     const { data } = await axios.post(this.urls.auth, params.toString(), {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      timeout: this.timeout,
     });
 
     if (!data.access_token) {
@@ -70,6 +75,7 @@ export class FIBGateway implements PaymentGateway {
     this.refreshToken = data.refresh_token || null;
     this.http = axios.create({
       baseURL: this.urls.payments,
+      timeout: this.timeout,
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${this.accessToken}`,
@@ -92,6 +98,7 @@ export class FIBGateway implements PaymentGateway {
 
       const { data } = await axios.post(this.urls.auth, params.toString(), {
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        timeout: this.timeout,
       });
 
       if (!data.access_token) {
@@ -102,6 +109,7 @@ export class FIBGateway implements PaymentGateway {
       this.refreshToken = data.refresh_token || this.refreshToken;
       this.http = axios.create({
         baseURL: this.urls.payments,
+        timeout: this.timeout,
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${this.accessToken}`,

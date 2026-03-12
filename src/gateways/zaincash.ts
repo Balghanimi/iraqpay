@@ -36,13 +36,17 @@ export class ZainCashGateway implements PaymentGateway {
   private baseUrl: string;
   private secret: Uint8Array;
 
+  private timeout: number;
+
   constructor(
     private config: ZainCashConfig,
     private sandbox: boolean = true,
     private language: string = 'ar',
+    timeout: number = 30000,
   ) {
     this.baseUrl = sandbox ? URLS.sandbox : URLS.production;
     this.secret = new TextEncoder().encode(config.secret);
+    this.timeout = timeout;
   }
 
   async createPayment(params: CreatePaymentParams): Promise<PaymentResult> {
@@ -79,6 +83,7 @@ export class ZainCashGateway implements PaymentGateway {
       }).toString(),
       {
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        timeout: this.timeout,
       },
     );
 
@@ -125,6 +130,7 @@ export class ZainCashGateway implements PaymentGateway {
       }).toString(),
       {
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        timeout: this.timeout,
       },
     );
 

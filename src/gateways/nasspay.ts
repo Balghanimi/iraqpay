@@ -41,11 +41,15 @@ export class NassPayGateway implements PaymentGateway {
   private tokenExpiresAt: number = 0;
   private http: AxiosInstance | null = null;
 
+  private timeout: number;
+
   constructor(
     private config: NassPayConfig,
     private sandbox: boolean = true,
+    timeout: number = 30000,
   ) {
     this.baseUrl = sandbox ? URLS.sandbox : URLS.production;
+    this.timeout = timeout;
   }
 
   private async authenticate(): Promise<void> {
@@ -55,7 +59,7 @@ export class NassPayGateway implements PaymentGateway {
         username: this.config.username,
         password: this.config.password,
       },
-      { headers: { 'Content-Type': 'application/json' } },
+      { headers: { 'Content-Type': 'application/json' }, timeout: this.timeout },
     );
 
     if (!data.access_token) {
@@ -73,6 +77,7 @@ export class NassPayGateway implements PaymentGateway {
     this.tokenExpiresAt = Date.now() + ttlMs - 10 * 60 * 1000; // refresh 10 min early
     this.http = axios.create({
       baseURL: this.baseUrl,
+      timeout: this.timeout,
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${this.accessToken}`,

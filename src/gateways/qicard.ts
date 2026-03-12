@@ -33,6 +33,7 @@ export class QiCardGateway implements PaymentGateway {
   constructor(
     private config: QiCardConfig,
     private sandbox: boolean = true,
+    timeout: number = 30000,
   ) {
     const baseURL = sandbox ? URLS.sandbox : URLS.production;
     const auth = Buffer.from(
@@ -41,6 +42,7 @@ export class QiCardGateway implements PaymentGateway {
 
     this.http = axios.create({
       baseURL,
+      timeout,
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Basic ${auth}`,

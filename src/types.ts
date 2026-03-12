@@ -60,6 +60,8 @@ export interface IraqPayConfig {
   sandbox?: boolean;
   language?: 'ar' | 'en' | 'ku';
   defaultGateway?: GatewayName;
+  /** Request timeout in milliseconds for all gateway API calls. Default: 30000 (30s) */
+  timeout?: number;
 }
 
 // ─── Payment Request / Response ─────────────────────────────────────────────
