@@ -1,5 +1,9 @@
 # IraqPay — Unified Payment SDK for Iraq
 
+[![CI](https://github.com/Balghanimi/iraqpay/actions/workflows/ci.yml/badge.svg)](https://github.com/Balghanimi/iraqpay/actions/workflows/ci.yml)
+[![npm version](https://img.shields.io/npm/v/iraqpay.svg)](https://www.npmjs.com/package/iraqpay)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 One SDK for **all** Iraqi payment gateways. Stop writing separate integrations for each gateway.
 
 | Gateway | Auth | Payment Flow | Refund | Status |
@@ -285,6 +289,10 @@ npm test
 ZAINCASH_LIVE=1 npm test
 ```
 
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for version history.
+
 ## License
 
 MIT
@@ -295,6 +303,7 @@ Pull requests welcome. For major changes, please open an issue first.
 
 ## Docs
 
+- [التوثيق بالعربي](README-AR.md) — الدليل الكامل بالعربي
 - [Testing Guide (English)](docs/TESTING-GUIDE.md) — how to test locally
 - [دليل التجربة (عربي)](docs/TESTING-GUIDE-AR.md) — شلون تجرّب محلياً
 

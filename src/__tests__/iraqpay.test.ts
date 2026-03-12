@@ -1,4 +1,4 @@
-import { IraqPay, GatewayNotConfiguredError } from '../index';
+import { IraqPay, GatewayNotConfiguredError, IraqPayError } from '../index';
 
 describe('IraqPay', () => {
   describe('initialization', () => {
@@ -98,6 +98,35 @@ describe('IraqPay', () => {
 
       const codGateway = pay.getGateway('cod');
       expect(codGateway.name).toBe('cod');
+    });
+  });
+
+  describe('input validation', () => {
+    let pay: IraqPay;
+
+    beforeEach(() => {
+      pay = new IraqPay({
+        gateways: { cod: {} },
+        defaultGateway: 'cod',
+      });
+    });
+
+    it('should reject empty orderId', async () => {
+      await expect(
+        pay.createPayment({ amount: 1000, orderId: '' }),
+      ).rejects.toThrow('orderId is required');
+    });
+
+    it('should reject zero amount', async () => {
+      await expect(
+        pay.createPayment({ amount: 0, orderId: 'test' }),
+      ).rejects.toThrow('amount must be a positive number');
+    });
+
+    it('should reject negative amount', async () => {
+      await expect(
+        pay.createPayment({ amount: -500, orderId: 'test' }),
+      ).rejects.toThrow('amount must be a positive number');
     });
   });
 

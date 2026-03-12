@@ -34,6 +34,7 @@ import {
   PaymentStatusResult,
   WebhookEvent,
   GatewayNotConfiguredError,
+  IraqPayError,
 } from './types';
 import { ZainCashGateway } from './gateways/zaincash';
 import { FIBGateway } from './gateways/fib';
@@ -128,6 +129,20 @@ export class IraqPay {
    * ```
    */
   async createPayment(params: CreatePaymentParams): Promise<PaymentResult> {
+    if (!params.orderId) {
+      throw new IraqPayError(
+        'orderId is required',
+        (params.gateway || this.defaultGateway || 'zaincash') as GatewayName,
+        'VALIDATION_ERROR',
+      );
+    }
+    if (typeof params.amount !== 'number' || params.amount <= 0) {
+      throw new IraqPayError(
+        'amount must be a positive number',
+        (params.gateway || this.defaultGateway || 'zaincash') as GatewayName,
+        'VALIDATION_ERROR',
+      );
+    }
     const gw = this.resolveGateway(params.gateway);
     return gw.createPayment(params);
   }

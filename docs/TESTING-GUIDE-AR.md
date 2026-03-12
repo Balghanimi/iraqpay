@@ -23,7 +23,7 @@ git clone https://github.com/Balghanimi/iraqpay.git
 cd iraqpay
 npm install
 npm run build     # يحوّل TypeScript → JavaScript
-npm test          # يشغّل 28 تست (لازم كلهم ينجحون)
+npm test          # يشغّل 55 تست (لازم كلهم ينجحون)
 ```
 
 <div dir="rtl">
@@ -252,7 +252,7 @@ ZAINCASH_LIVE=1 npm test
 
 <div dir="rtl">
 
-كلهم 28 تست لازم ينجحون. الفحص الحي يسوي دفعة تجريبية حقيقية على زين كاش.
+كلهم 55 تست لازم ينجحون. الفحص الحي يسوي دفعة تجريبية حقيقية على زين كاش.
 
 ---
 
