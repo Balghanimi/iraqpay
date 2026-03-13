@@ -88,7 +88,7 @@
 {\fontfamily{ptm}\selectfont
 \begin{abstract}
 {\fontsize{9pt}{9pt}\selectfont{\vspace*{-2mm}
-Payment infrastructure in emerging markets is often fragmented across multiple incompatible gateways, each with distinct authentication protocols, API conventions, and operational constraints. This paper presents IraqPay, the first open-source unified SDK that integrates five Iraqi payment gateways---ZainCash, First Iraqi Bank (FIB), QiCard, NassPay, and Cash-on-Delivery---through a single TypeScript API. Beyond gateway unification, IraqPay provides production-grade infrastructure: a circuit breaker for fault tolerance, a smart router with three routing strategies and automatic fallback chains, per-gateway analytics with latency percentiles and error breakdowns, request tracing with correlation IDs, and a benchmark suite for systematic performance comparison. We present the software architecture based on the adapter design pattern, analyze the heterogeneous authentication landscape, and provide benchmark results from live sandbox testing. IraqPay is deployed in a production food marketplace, published on npm, and available under the MIT license at \url{https://github.com/Balghanimi/iraqpay}.}}
+Payment infrastructure in emerging markets is often fragmented across multiple incompatible gateways, each with distinct authentication protocols, API conventions, and operational constraints. This paper presents IraqPay, an open-source unified SDK that integrates four Iraqi payment gateways---ZainCash, First Iraqi Bank (FIB), QiCard, and NassPay---plus a local Cash-on-Delivery (COD) tracker through a single TypeScript API. Beyond gateway unification, IraqPay provides production-grade infrastructure: a circuit breaker for fault tolerance, a smart router with three routing strategies and automatic fallback chains, per-gateway analytics with latency percentiles and error breakdowns, request tracing with correlation IDs, and a benchmark suite for systematic performance comparison. We present the software architecture based on the adapter design pattern, analyze the heterogeneous authentication landscape, and provide benchmark results from live sandbox testing. IraqPay is deployed in a production food marketplace, published on npm, and available under the MIT license at \url{https://github.com/Balghanimi/iraqpay}.}}
 \end{abstract}}
 
 {\fontfamily{ptm}\selectfont
@@ -112,32 +112,40 @@ D.2.11 [Software Architectures]: Patterns, D.2.13 [Reusable Software]: Reusable 
 
 \section{Introduction}
 
-Digital payment adoption in Iraq has accelerated rapidly since 2020, driven by mobile money services, government salary digitization, and post-pandemic e-commerce growth~[GSMA (2023)]. However, unlike mature markets where a single aggregator (e.g., Stripe, Adyen) provides a unified interface~[Stripe (2023)], the Iraqi payment landscape remains \emph{fragmented}: developers must integrate each gateway individually, dealing with five fundamentally different APIs, authentication schemes, response formats, and operational constraints.
+Digital payment adoption in Iraq has accelerated rapidly since 2020, driven by mobile money services, government salary digitization, and post-pandemic e-commerce growth~\cite{gsma2023}. However, unlike mature markets where a single aggregator (e.g., Stripe, Adyen) provides a unified interface~\cite{stripe2023}, the Iraqi payment landscape remains \emph{fragmented}: developers must integrate each gateway individually, dealing with five fundamentally different APIs, authentication schemes, response formats, and operational constraints.
 
 This fragmentation creates several problems. First, each gateway requires bespoke code for authentication, request construction, response parsing, and callback verification---multiplied by the number of gateways supported. Second, error codes, formats, and recovery strategies differ across gateways, making unified error handling difficult. Third, if a gateway experiences downtime, applications have no mechanism to automatically route payments to an alternative. Fourth, developers lack built-in tools to compare gateway performance or diagnose failures.
 
-Global payment aggregators (Stripe, PayPal, Adyen) do not operate in Iraq. Regional aggregators such as HyperPay and PayTabs serve parts of the Middle East but have limited or no Iraqi gateway coverage. To our knowledge, no open-source SDK provides unified access to Iraqi payment gateways.
+Global payment aggregators (Stripe, PayPal, Adyen) do not operate in Iraq~\cite{worldbank2023}. Regional aggregators such as HyperPay and PayTabs serve parts of the Middle East but have limited or no Iraqi gateway coverage. A search of npm, GitHub, and PyPI for packages related to ``iraq payment'', ``zaincash sdk'', and ``fib payment'' (conducted March 2026) returned no SDK covering more than two Iraqi gateways. The closest package, \texttt{iq-payment-sdk}, supports only ZainCash and Alqasa.
 
-This paper presents IraqPay, a unified open-source TypeScript SDK that addresses this gap by providing: (1)~a unified adapter-pattern SDK abstracting five Iraqi gateways behind a single API, (2)~production infrastructure including a circuit breaker, smart router, analytics engine, and request tracer, and (3)~a benchmark suite for systematic gateway performance comparison. The approach generalizes to any fragmented payment ecosystem in emerging markets.
+This paper presents IraqPay, a unified open-source TypeScript SDK that addresses this gap by providing: (1)~a unified adapter-pattern SDK abstracting four Iraqi gateways and a COD tracker behind a single API, (2)~production infrastructure including a circuit breaker, smart router, analytics engine, and request tracer, and (3)~a benchmark suite for systematic gateway performance comparison. The approach generalizes to any fragmented payment ecosystem in emerging markets.
 
-The remainder of this paper is organized as follows. Section~2 presents related work. Section~3 describes the software architecture. Section~4 provides illustrative usage examples. Section~5 presents benchmark results. Section~6 discusses a production case study. Section~7 analyzes generalizability and impact. Section~8 concludes.
+The remainder of this paper is organized as follows. Section~2 reviews related work. Section~3 describes the software architecture, including security considerations. Section~4 provides illustrative usage examples. Section~5 presents benchmark results with a threats-to-validity analysis. Section~6 discusses a production case study. Section~7 analyzes generalizability. Section~8 concludes.
 
 
 \section{Related Work}
 
 \subsection{Payment Aggregation}
 
-Payment aggregation SDKs consolidate multiple payment providers behind a unified interface. Stripe~[Stripe (2023)] is the dominant example in Western markets, supporting hundreds of payment methods across dozens of countries. However, Stripe does not operate in Iraq or most of the Middle East. Similar limitations apply to Adyen, Braintree, and Square.
+Payment aggregation SDKs consolidate multiple payment providers behind a unified interface. Stripe~\cite{stripe2023} is the dominant example in Western markets, supporting hundreds of payment methods across dozens of countries. However, Stripe does not operate in Iraq or most of the Middle East. Similar limitations apply to Adyen, Braintree, and Square.
 
-Regional aggregators have emerged to serve underserved markets. Paystack~[Paystack (2024)] serves West Africa (primarily Nigeria and Ghana), while Razorpay~[Razorpay (2024)] dominates the Indian market. HyperPay and PayTabs operate in parts of the Middle East but provide limited or no coverage for Iraqi gateways such as ZainCash and QiCard.
+Regional aggregators have emerged to serve underserved markets. Paystack~\cite{paystack2024} serves West Africa (primarily Nigeria and Ghana), while Razorpay~\cite{razorpay2024} dominates the Indian market. HyperPay and PayTabs operate in parts of the Middle East but provide limited or no coverage for Iraqi gateways such as ZainCash and QiCard.
 
 \subsection{Fault Tolerance in Payment Systems}
 
-The circuit breaker pattern, first described by Nygard~[Nygard (2018)] and popularized by Fowler~[Fowler (2014)], is widely used in microservice architectures to prevent cascading failures. Netflix's Hystrix library was among the first production implementations. In payment systems, circuit breakers are particularly important because gateway outages should not prevent all payments---they should trigger failover to alternative gateways.
+The circuit breaker pattern, first described by Nygard~\cite{nygard2018} and popularized by Fowler~\cite{fowler2014}, is widely used in microservice architectures to prevent cascading failures. Netflix's Hystrix library was among the first production implementations. In payment systems, circuit breakers are particularly important because gateway outages should not prevent all payments---they should trigger failover to alternative gateways.
+
+\subsection{Open-Source Multi-Gateway Libraries}
+
+Several open-source libraries apply the adapter pattern to payment gateway abstraction in other ecosystems. OmniPay~\cite{omnipay2024} provides a multi-gateway abstraction for PHP, supporting over 60 gateways (primarily Western); Active Merchant~\cite{activemerchant2024}, maintained by Shopify, does the same for Ruby. Both demonstrate the viability of the adapter pattern for payment unification but cover no Iraqi gateways. To our knowledge, no equivalent exists for the TypeScript/Node.js ecosystem targeting emerging-market gateways specifically.
 
 \subsection{Software Design Patterns}
 
-The adapter pattern~[Gamma et al. (1994)] provides the architectural foundation for IraqPay. By defining a common interface (\texttt{PaymentGateway}) and implementing gateway-specific adapters, the system decouples application logic from gateway-specific details. This pattern is well-established in software engineering but, to our knowledge, has not been applied to Iraqi payment gateway unification in an open-source context.
+The adapter pattern~\cite{gamma1994} provides the architectural foundation for IraqPay. By defining a common interface (\texttt{PaymentGateway}) and implementing gateway-specific adapters, the system decouples application logic from gateway-specific details.
+
+\subsection{Digital Finance in Emerging Markets}
+
+Mobile money and digital payment adoption in developing countries have been studied extensively. Suri and Jack~\cite{suri2016} demonstrated that mobile money lifted 2\% of Kenyan households out of poverty, underscoring the economic impact of accessible payment infrastructure. The World Bank~\cite{worldbank2023} notes that Iraq's financial inclusion rate remains among the lowest in the Middle East, with digital payment infrastructure fragmentation cited as a key barrier. PCI-DSS compliance~\cite{pcidss2022} remains a challenge for Iraqi gateways, most of which implement proprietary security models rather than standardized card-processing frameworks.
 
 
 \section{Software Architecture}
@@ -203,9 +211,34 @@ Table~\ref{table:gateway-comparison} summarizes the heterogeneity across the fiv
 
 \textbf{COD (Cash-on-Delivery)} is a local state tracker with a pluggable storage interface, allowing developers to substitute in-memory storage with a database adapter.
 
+\subsection{Comparison with Manual Integration}
+
+Table~\ref{table:comparison} compares the IraqPay approach with manual per-gateway integration, where each gateway SDK is integrated independently.
+
+\begin{table}[ht]
+    \centering
+    \setlength\tabcolsep{3pt}
+    \small
+    \begin{tabular}{lcc}
+        \toprule
+        \bfseries Aspect & \bfseries Manual (per-gateway) & \bfseries IraqPay \\
+        \midrule
+        Lines of integration code & $\sim$80--150 per gateway & $\sim$15--20 total \\
+        Auth implementations & 4 separate & 0 (handled by SDK) \\
+        Callback verification & 4 separate parsers & 1 unified handler \\
+        Gateway failover & Custom or none & Built-in (3 strategies) \\
+        Circuit breaker & Custom or none & Built-in \\
+        Performance monitoring & Custom or none & Built-in analytics \\
+        Adding a new gateway & Full re-implementation & Implement 5 methods \\
+        \bottomrule
+    \end{tabular}
+    \caption{\fontsize{10pt}{11pt}\selectfont{\itshape{Comparison of IraqPay unified SDK vs.\ manual per-gateway integration.}}}
+    \label{table:comparison}
+\end{table}
+
 \subsection{Circuit Breaker}
 
-The circuit breaker implements the standard three-state pattern~[Nygard (2018), Fowler (2014)] with per-gateway isolation:
+The circuit breaker implements the standard three-state pattern~\cite{nygard2018,fowler2014} with per-gateway isolation:
 
 \begin{itemize}
 \item \textbf{Closed} (normal): Requests pass through. Consecutive failures are counted.
@@ -232,6 +265,14 @@ All strategies respect gateway rules (minimum/maximum amounts, supported currenc
 The analytics engine collects metrics in a sliding window (configurable, default 1000 samples per gateway) and exposes per-gateway latency percentiles (p50, p95, p99), success/failure rates, error breakdowns by code, and real-time event listeners.
 
 The tracing module assigns unique 128-bit correlation IDs to every payment operation. A structured \texttt{Logger} interface allows integration with any logging framework. Log entries include trace ID, span ID, gateway name, operation type, duration, and optional metadata.
+
+\subsection{Security Considerations}
+
+IraqPay handles sensitive credentials (JWT secrets, OAuth tokens, API keys) and must be deployed responsibly. The SDK enforces HTTPS for all external API calls in production mode (sandbox mode permits HTTP for local testing). Gateway credentials are passed at instantiation and held in memory only; the SDK never persists secrets to disk or logs.
+
+Each gateway adapter implements its own authentication security: ZainCash signs payloads with HMAC-SHA256 and verifies callback JWTs before accepting payment status updates; FIB uses OAuth2 with automatic token rotation; QiCard performs server-side 3DS verification on every callback, preventing client-side tampering; NassPay implements conservative token TTL (50 minutes) with automatic refresh.
+
+The SDK does not directly process card numbers---all card-present flows use gateway-hosted redirect pages, keeping the integrating application outside PCI-DSS scope~\cite{pcidss2022}. Input validation is applied at the SDK boundary: amounts are checked against gateway-specific minimums, currency codes are validated, and callback payloads are cryptographically verified before any status update is emitted.
 
 \subsection{Benchmark Suite}
 
@@ -330,7 +371,11 @@ To characterize gateway performance, we executed 50 payment creation requests ag
     \label{table:benchmarks}
 \end{table}
 
-ZainCash exhibits stable performance with a median latency of 248~ms and 100\% success rate over 50 consecutive requests. The first request shows a cold-start penalty (934~ms), after which latency stabilizes in the 229--355~ms range. The COD gateway, being purely local, operates at sub-millisecond latency. Network probes to FIB, QiCard, and NassPay confirm that all sandbox endpoints are reachable from Iraq with round-trip times of 127--188~ms, consistent with regional hosting.
+ZainCash exhibits stable performance with a median latency of 248~ms and 100\% success rate over 50 consecutive requests. The first request shows a cold-start penalty (934~ms, reported as P99 due to the sample size), after which latency stabilizes in the 229--355~ms range. The COD gateway, being purely local, operates at sub-millisecond latency. Network probes to FIB, QiCard, and NassPay confirm that all sandbox endpoints are reachable from Iraq with round-trip times of 127--188~ms, consistent with regional hosting.
+
+\subsection{Threats to Validity}
+
+Several limitations affect the generalizability of these benchmarks. First, all measurements were taken against sandbox (test) environments, which may differ from production in terms of server load, network configuration, and rate limiting. Second, for FIB, QiCard, and NassPay, only network reachability was measured because valid sandbox merchant credentials require a commercial agreement; the probe latencies reflect round-trip time to the first HTTP error response rather than complete payment flow latency. Third, the sample size ($N=50$ for ZainCash and COD, $N=10$ for probes) is modest; a longitudinal study with larger samples across different times of day would provide stronger statistical confidence. Fourth, all benchmarks were executed from a single geographic location (Najaf, Iraq); developers in other Iraqi cities or neighboring countries may observe different latencies. Despite these limitations, the benchmarks provide a useful baseline characterization and demonstrate the SDK's benchmark suite methodology.
 
 
 \section{Case Study: Akel Bait Food Marketplace}
@@ -339,6 +384,8 @@ IraqPay is deployed in \emph{Akel Bait}, a production food marketplace serving c
 
 The integration required fewer than 20 lines of application code---a single \texttt{IraqPay} instantiation and a \texttt{createPayment} call in the checkout flow. The Express.js webhook middleware handles all callback verification and status updates automatically. The analytics engine provides the operations team with real-time visibility into payment success rates and gateway latency, enabling data-driven decisions about which gateways to prioritize.
 
+IraqPay is published on npm and received 73 downloads in its first week (March 2026). As a newly released package, third-party adoption data is not yet available; we plan to report adoption metrics in a follow-up study. We acknowledge that the current case study represents self-validation by the SDK author, and independent adoption will provide stronger evidence of the SDK's practical utility.
+
 
 \section{Impact and Generalizability}
 
@@ -346,28 +393,25 @@ While IraqPay targets the Iraqi market, its architecture is intentionally genera
 
 The open-source availability (MIT license) and npm distribution model lower the barrier for developers in these markets to either adopt IraqPay directly or fork it as a starting point. The benchmark suite provides a methodological contribution: a standardized, reproducible approach to comparing payment gateway performance that is currently absent from the fintech ecosystem.
 
-\subsection{AI Tool Disclosure}
-
-In accordance with J.UCS policy, we disclose that Claude (Anthropic, Claude Opus 4.6) was used as a coding assistant during the development of IraqPay's source code and during manuscript preparation. All code was reviewed, tested, and validated by the author. The author retains full responsibility for the correctness and originality of all content.
-
-
 \section{Conclusions and Future Work}
 
 IraqPay demonstrates that payment gateway fragmentation in emerging markets can be effectively addressed through a well-designed adapter-pattern SDK with production-grade infrastructure. The key contributions are:
 
 \begin{enumerate}
-\item The first open-source unified SDK for Iraqi payment gateways, abstracting five heterogeneous APIs behind a single interface.
+\item The most comprehensive open-source unified SDK for Iraqi payment gateways, abstracting four heterogeneous external APIs and a COD tracker behind a single interface.
 \item Production infrastructure (circuit breaker, smart router, analytics, tracing) that goes beyond simple API unification to address real-world reliability and observability requirements.
 \item A benchmark suite enabling systematic, reproducible gateway performance comparison.
 \item An architecture pattern that generalizes to any fragmented payment ecosystem.
 \end{enumerate}
 
-The software is published on npm (\texttt{npm install iraqpay}), available on GitHub under the MIT license, and deployed in a production food marketplace. The codebase comprises approximately 5,000 lines of TypeScript with 111 passing tests across 13 test suites.
+The software is published on npm (\texttt{npm install iraqpay}), available on GitHub under the MIT license, and deployed in a production food marketplace. The codebase comprises approximately 3,000 lines of TypeScript source code (excluding tests), with 112 tests (78 unit tests, 32 integration tests, and 2 live sandbox tests) across 13 test suites achieving 100\% pass rate.
 
 Future work includes adding support for subscription and recurring payments, integrating additional Middle Eastern gateways (e.g., Iraqi mobile wallets), conducting a longitudinal production reliability study, and investigating machine-learning-based gateway selection that adapts to time-of-day and transaction-type patterns.
 
 \begin{Acknowledgements}
 This work was supported by the University of Kufa, Faculty of Engineering.
+
+\textbf{AI Tool Disclosure:} In accordance with J.UCS policy, we disclose that Claude (Anthropic, Claude Opus 4.6) was used as a coding assistant during the development of IraqPay's source code and during manuscript preparation. All code was reviewed, tested, and validated by the author. The author retains full responsibility for the correctness and originality of all content.
 \end{Acknowledgements}
 
 
@@ -393,6 +437,14 @@ This work was supported by the University of Kufa, Faculty of Engineering.
 \bibitem[ZainCash (2024)]{zaincash2024} Zain Cash: ``ZainCash API Documentation''; \url{https://docs.zaincash.iq} (2024).
 
 \bibitem[FIB (2024)]{fib2024} First Iraqi Bank: ``FIB Payment Gateway Developer Guide''; \url{https://fib.iq} (2024).
+
+\bibitem[OmniPay (2024)]{omnipay2024} The League of Extraordinary Packages: ``OmniPay: Multi-gateway Payment Processing Library for PHP''; \url{https://omnipay.thephpleague.com} (2024).
+
+\bibitem[Active Merchant (2024)]{activemerchant2024} Shopify: ``Active Merchant: Payment Abstraction Library for Ruby''; \url{https://github.com/activemerchant/active\_merchant} (2024).
+
+\bibitem[Suri and Jack (2016)]{suri2016} Suri, T., Jack, W.: ``The Long-Run Poverty and Gender Impacts of Mobile Money''; Science, 354, 6317, 1288--1292 (2016).
+
+\bibitem[PCI SSC (2022)]{pcidss2022} PCI Security Standards Council: ``Payment Card Industry Data Security Standard v4.0''; PCI SSC, Wakefield, MA (2022).
 
 }\end{thebibliography}
 
