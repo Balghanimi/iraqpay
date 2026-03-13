@@ -13,6 +13,9 @@
  *     fib: { clientId: '...', clientSecret: '...' },
  *   },
  *   sandbox: true,
+ *   analytics: { enabled: true },
+ *   circuitBreaker: { failureThreshold: 3 },
+ *   router: { enabled: true, strategy: 'lowest-latency' },
  * });
  *
  * const payment = await pay.createPayment({
@@ -21,6 +24,9 @@
  *   orderId: 'order_123',
  *   callbackUrl: 'https://myapp.com/callback',
  * });
+ *
+ * // Access metrics
+ * console.log(pay.analytics.getMetrics());
  * ```
  *
  * @packageDocumentation
@@ -73,3 +79,52 @@ export type {
   WebhookHandlerOptions,
   CheckoutHandlerOptions,
 } from './middleware/express';
+
+// Analytics & Metrics
+export { Analytics } from './analytics';
+export type {
+  AnalyticsConfig,
+  AnalyticsEvent,
+  AnalyticsEventType,
+  AnalyticsListener,
+  GatewayMetrics,
+  AggregateMetrics,
+} from './analytics';
+
+// Circuit Breaker
+export { CircuitBreaker } from './circuit-breaker';
+export type {
+  CircuitBreakerConfig,
+  CircuitState,
+  CircuitStatus,
+} from './circuit-breaker';
+
+// Smart Router
+export { SmartRouter } from './router';
+export type {
+  RouterConfig,
+  RoutingStrategy,
+  GatewayRule,
+  RouteResult,
+} from './router';
+
+// Request Tracing
+export { Tracer, TraceContext, ConsoleLogger } from './tracing';
+export type {
+  TracingConfig,
+  LogLevel,
+  LogEntry,
+  Logger,
+} from './tracing';
+
+// Benchmark Suite
+export { BenchmarkRunner } from './benchmark';
+export type {
+  BenchmarkConfig,
+  BenchmarkProgress,
+  BenchmarkReport,
+  GatewayBenchmarkResult,
+  LatencyStats,
+  ComparisonTable,
+  RawBenchmarkEntry,
+} from './benchmark';

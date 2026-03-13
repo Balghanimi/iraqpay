@@ -62,6 +62,14 @@ export interface IraqPayConfig {
   defaultGateway?: GatewayName;
   /** Request timeout in milliseconds for all gateway API calls. Default: 30000 (30s) */
   timeout?: number;
+  /** Analytics & metrics configuration */
+  analytics?: import('./analytics').AnalyticsConfig;
+  /** Circuit breaker configuration for fault tolerance */
+  circuitBreaker?: import('./circuit-breaker').CircuitBreakerConfig;
+  /** Smart gateway router configuration */
+  router?: import('./router').RouterConfig;
+  /** Request tracing & structured logging configuration */
+  tracing?: import('./tracing').TracingConfig;
 }
 
 // ─── Payment Request / Response ─────────────────────────────────────────────
