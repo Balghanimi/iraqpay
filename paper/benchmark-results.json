@@ -1,0 +1,228 @@
+{
+  "timestamp": "2026-03-13T08:47:29.681Z",
+  "zaincash": {
+    "gateway": "zaincash",
+    "iterations": 50,
+    "successCount": 50,
+    "failureCount": 0,
+    "successRate": 1,
+    "latencies": [
+      934,
+      231,
+      253,
+      254,
+      246,
+      243,
+      653,
+      250,
+      253,
+      242,
+      233,
+      235,
+      264,
+      232,
+      252,
+      240,
+      269,
+      265,
+      247,
+      248,
+      248,
+      246,
+      238,
+      328,
+      229,
+      237,
+      240,
+      251,
+      237,
+      239,
+      240,
+      260,
+      230,
+      265,
+      250,
+      316,
+      257,
+      251,
+      261,
+      355,
+      391,
+      290,
+      237,
+      270,
+      245,
+      248,
+      315,
+      241,
+      232,
+      247
+    ],
+    "errors": [],
+    "stats": {
+      "min": 229,
+      "max": 934,
+      "avg": 278.76,
+      "median": 248,
+      "p95": 391,
+      "p99": 934,
+      "stdDev": 113.27074820976509
+    }
+  },
+  "cod": {
+    "gateway": "cod",
+    "iterations": 50,
+    "successCount": 50,
+    "failureCount": 0,
+    "successRate": 1,
+    "latencies": [
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "errors": [],
+    "stats": {
+      "min": 0,
+      "max": 1,
+      "avg": 0.06,
+      "median": 0,
+      "p95": 1,
+      "p99": 1,
+      "stdDev": 0.23748684174075835
+    }
+  },
+  "fib_probe": {
+    "gateway": "fib",
+    "iterations": 10,
+    "successCount": 0,
+    "failureCount": 10,
+    "successRate": 0,
+    "latencies": [],
+    "errors": [
+      {
+        "code": "Request failed with status code 401",
+        "message": "Request failed with status code 401",
+        "count": 5
+      },
+      {
+        "code": "[ALL_GATEWAYS_FAILED] All gateways failed",
+        "message": "[ALL_GATEWAYS_FAILED] All gateways failed",
+        "count": 5
+      }
+    ],
+    "stats": {
+      "min": 0,
+      "max": 0,
+      "avg": 0,
+      "median": 0,
+      "p95": 0,
+      "p99": 0,
+      "stdDev": 0
+    }
+  },
+  "qicard_probe": {
+    "gateway": "qicard",
+    "iterations": 10,
+    "successCount": 0,
+    "failureCount": 10,
+    "successRate": 0,
+    "latencies": [],
+    "errors": [
+      {
+        "code": "[PAYMENT_FAILED] Request failed with status code 403",
+        "message": "[PAYMENT_FAILED] Request failed with status code 403",
+        "count": 5
+      },
+      {
+        "code": "[ALL_GATEWAYS_FAILED] All gateways failed",
+        "message": "[ALL_GATEWAYS_FAILED] All gateways failed",
+        "count": 5
+      }
+    ],
+    "stats": {
+      "min": 0,
+      "max": 0,
+      "avg": 0,
+      "median": 0,
+      "p95": 0,
+      "p99": 0,
+      "stdDev": 0
+    }
+  },
+  "nasspay_probe": {
+    "gateway": "nasspay",
+    "iterations": 10,
+    "successCount": 0,
+    "failureCount": 10,
+    "successRate": 0,
+    "latencies": [],
+    "errors": [
+      {
+        "code": "[PAYMENT_FAILED] Request failed with status code 422",
+        "message": "[PAYMENT_FAILED] Request failed with status code 422",
+        "count": 5
+      },
+      {
+        "code": "[ALL_GATEWAYS_FAILED] All gateways failed",
+        "message": "[ALL_GATEWAYS_FAILED] All gateways failed",
+        "count": 5
+      }
+    ],
+    "stats": {
+      "min": 0,
+      "max": 0,
+      "avg": 0,
+      "median": 0,
+      "p95": 0,
+      "p99": 0,
+      "stdDev": 0
+    }
+  }
+}

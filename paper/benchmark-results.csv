@@ -1,0 +1,131 @@
+gateway,iteration,success,latency_ms,error,timestamp
+zaincash,1,true,934,,1773391568468
+zaincash,2,true,231,,1773391570408
+zaincash,3,true,253,,1773391571643
+zaincash,4,true,254,,1773391572898
+zaincash,5,true,246,,1773391574165
+zaincash,6,true,243,,1773391575413
+zaincash,7,true,653,,1773391576665
+zaincash,8,true,250,,1773391578318
+zaincash,9,true,253,,1773391579583
+zaincash,10,true,242,,1773391580836
+zaincash,11,true,233,,1773391582087
+zaincash,12,true,235,,1773391583321
+zaincash,13,true,264,,1773391584570
+zaincash,14,true,232,,1773391585855
+zaincash,15,true,252,,1773391587091
+zaincash,16,true,240,,1773391588342
+zaincash,17,true,269,,1773391589583
+zaincash,18,true,265,,1773391590868
+zaincash,19,true,247,,1773391592144
+zaincash,20,true,248,,1773391593401
+zaincash,21,true,248,,1773391594651
+zaincash,22,true,246,,1773391595905
+zaincash,23,true,238,,1773391597160
+zaincash,24,true,328,,1773391598403
+zaincash,25,true,229,,1773391599743
+zaincash,26,true,237,,1773391600974
+zaincash,27,true,240,,1773391602219
+zaincash,28,true,251,,1773391603471
+zaincash,29,true,237,,1773391604733
+zaincash,30,true,239,,1773391605976
+zaincash,31,true,240,,1773391607217
+zaincash,32,true,260,,1773391608469
+zaincash,33,true,230,,1773391609735
+zaincash,34,true,265,,1773391610978
+zaincash,35,true,250,,1773391612244
+zaincash,36,true,316,,1773391613495
+zaincash,37,true,257,,1773391614823
+zaincash,38,true,251,,1773391616083
+zaincash,39,true,261,,1773391617349
+zaincash,40,true,355,,1773391618615
+zaincash,41,true,391,,1773391619973
+zaincash,42,true,290,,1773391621379
+zaincash,43,true,237,,1773391622679
+zaincash,44,true,270,,1773391623926
+zaincash,45,true,245,,1773391625201
+zaincash,46,true,248,,1773391626450
+zaincash,47,true,315,,1773391627719
+zaincash,48,true,241,,1773391629050
+zaincash,49,true,232,,1773391630296
+zaincash,50,true,247,,1773391631531
+cod,1,true,0,,1773391631779
+cod,2,true,1,,1773391631779
+cod,3,true,0,,1773391631780
+cod,4,true,0,,1773391631780
+cod,5,true,0,,1773391631780
+cod,6,true,0,,1773391631780
+cod,7,true,0,,1773391631780
+cod,8,true,0,,1773391631780
+cod,9,true,0,,1773391631780
+cod,10,true,0,,1773391631780
+cod,11,true,0,,1773391631780
+cod,12,true,0,,1773391631780
+cod,13,true,0,,1773391631780
+cod,14,true,0,,1773391631780
+cod,15,true,0,,1773391631780
+cod,16,true,0,,1773391631780
+cod,17,true,0,,1773391631780
+cod,18,true,0,,1773391631780
+cod,19,true,0,,1773391631780
+cod,20,true,0,,1773391631780
+cod,21,true,0,,1773391631780
+cod,22,true,0,,1773391631780
+cod,23,true,1,,1773391631780
+cod,24,true,0,,1773391631781
+cod,25,true,0,,1773391631781
+cod,26,true,0,,1773391631781
+cod,27,true,0,,1773391631781
+cod,28,true,0,,1773391631781
+cod,29,true,0,,1773391631781
+cod,30,true,0,,1773391631781
+cod,31,true,0,,1773391631781
+cod,32,true,0,,1773391631781
+cod,33,true,0,,1773391631781
+cod,34,true,0,,1773391631781
+cod,35,true,0,,1773391631781
+cod,36,true,0,,1773391631781
+cod,37,true,0,,1773391631781
+cod,38,true,0,,1773391631781
+cod,39,true,0,,1773391631781
+cod,40,true,0,,1773391631781
+cod,41,true,0,,1773391631781
+cod,42,true,0,,1773391631781
+cod,43,true,0,,1773391631781
+cod,44,true,0,,1773391631781
+cod,45,true,0,,1773391631781
+cod,46,true,1,,1773391631781
+cod,47,true,0,,1773391631782
+cod,48,true,0,,1773391631782
+cod,49,true,0,,1773391631782
+cod,50,true,0,,1773391631782
+fib,1,false,613,"Request failed with status code 401",1773391631782
+fib,2,false,188,"Request failed with status code 401",1773391632910
+fib,3,false,189,"Request failed with status code 401",1773391633612
+fib,4,false,191,"Request failed with status code 401",1773391634313
+fib,5,false,187,"Request failed with status code 401",1773391635004
+fib,6,false,1,"[ALL_GATEWAYS_FAILED] All gateways failed",1773391635692
+fib,7,false,0,"[ALL_GATEWAYS_FAILED] All gateways failed",1773391636202
+fib,8,false,0,"[ALL_GATEWAYS_FAILED] All gateways failed",1773391636716
+fib,9,false,0,"[ALL_GATEWAYS_FAILED] All gateways failed",1773391637224
+fib,10,false,0,"[ALL_GATEWAYS_FAILED] All gateways failed",1773391637739
+qicard,1,false,859,"[PAYMENT_FAILED] Request failed with status code 403",1773391637740
+qicard,2,false,151,"[PAYMENT_FAILED] Request failed with status code 403",1773391639106
+qicard,3,false,171,"[PAYMENT_FAILED] Request failed with status code 403",1773391639765
+qicard,4,false,173,"[PAYMENT_FAILED] Request failed with status code 403",1773391640452
+qicard,5,false,146,"[PAYMENT_FAILED] Request failed with status code 403",1773391641139
+qicard,6,false,0,"[ALL_GATEWAYS_FAILED] All gateways failed",1773391641799
+qicard,7,false,0,"[ALL_GATEWAYS_FAILED] All gateways failed",1773391642312
+qicard,8,false,0,"[ALL_GATEWAYS_FAILED] All gateways failed",1773391642813
+qicard,9,false,0,"[ALL_GATEWAYS_FAILED] All gateways failed",1773391643326
+qicard,10,false,0,"[ALL_GATEWAYS_FAILED] All gateways failed",1773391643832
+nasspay,1,false,584,"[PAYMENT_FAILED] Request failed with status code 422",1773391643833
+nasspay,2,false,185,"[PAYMENT_FAILED] Request failed with status code 422",1773391644918
+nasspay,3,false,167,"[PAYMENT_FAILED] Request failed with status code 422",1773391645609
+nasspay,4,false,171,"[PAYMENT_FAILED] Request failed with status code 422",1773391646280
+nasspay,5,false,162,"[PAYMENT_FAILED] Request failed with status code 422",1773391646964
+nasspay,6,false,0,"[ALL_GATEWAYS_FAILED] All gateways failed",1773391647640
+nasspay,7,false,0,"[ALL_GATEWAYS_FAILED] All gateways failed",1773391648143
+nasspay,8,false,0,"[ALL_GATEWAYS_FAILED] All gateways failed",1773391648658
+nasspay,9,false,0,"[ALL_GATEWAYS_FAILED] All gateways failed",1773391649161
+nasspay,10,false,0,"[ALL_GATEWAYS_FAILED] All gateways failed",1773391649677
