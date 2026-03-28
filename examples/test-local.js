@@ -10,6 +10,8 @@
 
 const { IraqPay } = require('../dist');
 
+// These are ZainCash's PUBLIC sandbox test credentials (not real secrets).
+// For production, always use environment variables — see .env.example.
 const pay = new IraqPay({
   gateways: {
     zaincash: {

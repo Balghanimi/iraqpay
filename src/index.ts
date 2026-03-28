@@ -128,3 +128,13 @@ export type {
   ComparisonTable,
   RawBenchmarkEntry,
 } from './benchmark';
+
+// Environment variable resolution
+export {
+  resolveGatewayConfigs,
+  resolveZainCashConfig,
+  resolveFIBConfig,
+  resolveQiCardConfig,
+  resolveNassPayConfig,
+  IRAQPAY_ENV_VARS,
+} from './env';

@@ -48,10 +48,14 @@ export interface CODOrderData {
 }
 
 export interface GatewayConfigs {
-  zaincash?: ZainCashConfig;
-  fib?: FIBConfig;
-  qicard?: QiCardConfig;
-  nasspay?: NassPayConfig;
+  /** ZainCash config. Pass {} to resolve all fields from IRAQPAY_ZAINCASH_* env vars. */
+  zaincash?: Partial<ZainCashConfig>;
+  /** FIB config. Pass {} to resolve all fields from IRAQPAY_FIB_* env vars. */
+  fib?: Partial<FIBConfig>;
+  /** QiCard config. Pass {} to resolve all fields from IRAQPAY_QICARD_* env vars. */
+  qicard?: Partial<QiCardConfig>;
+  /** NassPay config. Pass {} to resolve all fields from IRAQPAY_NASSPAY_* env vars. */
+  nasspay?: Partial<NassPayConfig>;
   cod?: CODConfig;
 }
 

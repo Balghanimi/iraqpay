@@ -23,16 +23,14 @@ const { IraqPay, createWebhookHandler, createCheckoutHandler } = require('../dis
 const app = express();
 app.use(express.json());
 
+// Credentials resolved from IRAQPAY_* environment variables automatically.
+// Set them in your .env file — see .env.example for the full list.
 const pay = new IraqPay({
   gateways: {
-    zaincash: {
-      msisdn: process.env.ZAINCASH_MSISDN || '9647835077893',
-      merchantId: process.env.ZAINCASH_MERCHANT_ID || '5ffacf6612b5777c6d44266f',
-      secret: process.env.ZAINCASH_SECRET || '$2y$10$hBbAZo2GfSSvyqAyV2SaqOfYewgYpfR1O19gIh4SqyGWdmySZYPuS',
-    },
+    zaincash: {}, // resolved from IRAQPAY_ZAINCASH_* env vars
     cod: {},
   },
-  sandbox: true,
+  sandbox: process.env.IRAQPAY_SANDBOX !== 'false',
   language: 'ar',
   defaultGateway: 'zaincash',
 });

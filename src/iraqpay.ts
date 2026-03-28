@@ -57,6 +57,7 @@ import { Analytics, type AnalyticsConfig } from './analytics';
 import { CircuitBreaker, type CircuitBreakerConfig } from './circuit-breaker';
 import { SmartRouter, type RouterConfig } from './router';
 import { Tracer, TraceContext, type TracingConfig } from './tracing';
+import { resolveGatewayConfigs } from './env';
 
 export class IraqPay {
   private gateways: Map<GatewayName, PaymentGateway> = new Map();
@@ -71,11 +72,45 @@ export class IraqPay {
   /** Tracer — structured logging with correlation IDs */
   readonly tracer: Tracer;
 
+  /**
+   * Create an IraqPay instance with all credentials resolved from environment
+   * variables. Only gateways whose IRAQPAY_* env vars are fully set will be
+   * configured.
+   *
+   * @example
+   * ```typescript
+   * // Set IRAQPAY_ZAINCASH_MSISDN, IRAQPAY_ZAINCASH_MERCHANT_ID, IRAQPAY_ZAINCASH_SECRET
+   * // in your .env file, then:
+   * const pay = IraqPay.fromEnv({ sandbox: true });
+   * ```
+   */
+  static fromEnv(
+    options: Omit<IraqPayConfig, 'gateways'> & { gateways?: GatewayName[] } = {},
+  ): IraqPay {
+    const gatewayNames = options.gateways ?? (['zaincash', 'fib', 'qicard', 'nasspay', 'cod'] as GatewayName[]);
+    const gatewayConfigs: IraqPayConfig['gateways'] = {};
+
+    for (const name of gatewayNames) {
+      if (name === 'cod') {
+        gatewayConfigs.cod = {};
+      } else {
+        // Set empty object — constructor will resolve from env vars
+        (gatewayConfigs as Record<string, unknown>)[name] = {};
+      }
+    }
+
+    const { gateways: _, ...rest } = options;
+    return new IraqPay({ ...rest, gateways: gatewayConfigs });
+  }
+
   constructor(private config: IraqPayConfig) {
     const sandbox = config.sandbox ?? true;
     const lang = config.language || 'ar';
     const timeout = config.timeout ?? 30000;
     this.defaultGateway = config.defaultGateway;
+
+    // Resolve credentials: explicit config > env vars > throw
+    const resolved = resolveGatewayConfigs(config.gateways);
 
     // Initialize infrastructure
     this.analytics = new Analytics(config.analytics);
@@ -83,37 +118,37 @@ export class IraqPay {
     this.router = new SmartRouter(config.router, this.circuitBreaker, this.analytics);
     this.tracer = new Tracer(config.tracing);
 
-    // Initialize configured gateways
-    if (config.gateways.zaincash) {
+    // Initialize configured gateways with resolved credentials
+    if (resolved.zaincash) {
       this.gateways.set(
         'zaincash',
-        new ZainCashGateway(config.gateways.zaincash, sandbox, lang, timeout),
+        new ZainCashGateway(resolved.zaincash, sandbox, lang, timeout),
       );
     }
 
-    if (config.gateways.fib) {
+    if (resolved.fib) {
       this.gateways.set(
         'fib',
-        new FIBGateway(config.gateways.fib, sandbox, timeout),
+        new FIBGateway(resolved.fib, sandbox, timeout),
       );
     }
 
-    if (config.gateways.qicard) {
+    if (resolved.qicard) {
       this.gateways.set(
         'qicard',
-        new QiCardGateway(config.gateways.qicard, sandbox, timeout),
+        new QiCardGateway(resolved.qicard, sandbox, timeout),
       );
     }
 
-    if (config.gateways.nasspay) {
+    if (resolved.nasspay) {
       this.gateways.set(
         'nasspay',
-        new NassPayGateway(config.gateways.nasspay, sandbox, timeout),
+        new NassPayGateway(resolved.nasspay, sandbox, timeout),
       );
     }
 
-    if (config.gateways.cod) {
-      this.gateways.set('cod', new CODGateway(config.gateways.cod));
+    if (resolved.cod) {
+      this.gateways.set('cod', new CODGateway(resolved.cod));
     }
   }
 

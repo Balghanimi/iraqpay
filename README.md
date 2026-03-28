@@ -14,6 +14,16 @@ One SDK for **all** Iraqi payment gateways. Stop writing separate integrations f
 | **NassPay** | Bearer token | 3DS redirect | Manual | Ready |
 | **COD** | None | Tracking only | Manual | Ready |
 
+## Security
+
+**Credentials must be stored in environment variables, never in source code.**
+
+- Store all gateway credentials in a `.env` file
+- Add `.env` to your `.gitignore` (it is already in ours)
+- **Never commit credentials** to version control
+- If credentials were ever committed to git, **rotate them immediately** — git history preserves them even after deletion
+- Use `.env.example` as your template (contains only placeholder values)
+
 ## Install
 
 ```bash
@@ -22,38 +32,96 @@ npm install iraqpay
 
 ## Quick Start
 
+**Step 1:** Copy `.env.example` to `.env` and fill in your credentials:
+
+```bash
+cp .env.example .env
+```
+
+```bash
+# .env
+IRAQPAY_ZAINCASH_MSISDN=9647XXXXXXXXX
+IRAQPAY_ZAINCASH_MERCHANT_ID=your_merchant_id
+IRAQPAY_ZAINCASH_SECRET=your_secret
+
+IRAQPAY_FIB_CLIENT_ID=your_client_id
+IRAQPAY_FIB_CLIENT_SECRET=your_client_secret
+```
+
+**Step 2:** Initialize IraqPay — credentials are resolved from env vars automatically:
+
 ```typescript
 import { IraqPay } from 'iraqpay';
 
-const pay = new IraqPay({
-  gateways: {
-    zaincash: {
-      msisdn: '9647XXXXXXXXX',
-      merchantId: 'your_merchant_id',
-      secret: 'your_secret',
-    },
-    fib: {
-      clientId: 'your_client_id',
-      clientSecret: 'your_client_secret',
-    },
-  },
-  sandbox: true, // Use test environments
-  language: 'ar', // 'ar' | 'en' | 'ku'
+// Recommended: resolve credentials from IRAQPAY_* environment variables
+const pay = IraqPay.fromEnv({
+  sandbox: true,
+  language: 'ar',
 });
 
-// Create a payment — same interface for every gateway
+// Or specify which gateways to enable:
+const pay = IraqPay.fromEnv({
+  gateways: ['zaincash', 'fib'],
+  sandbox: true,
+});
+
+// Or pass an empty config object per gateway (same effect):
+const pay = new IraqPay({
+  gateways: {
+    zaincash: {}, // resolved from IRAQPAY_ZAINCASH_* env vars
+    fib: {},      // resolved from IRAQPAY_FIB_* env vars
+  },
+  sandbox: true,
+});
+```
+
+**Step 3:** Create a payment — same interface for every gateway:
+
+```typescript
 const payment = await pay.createPayment({
   gateway: 'zaincash',
-  amount: 25000, // IQD (integer, no decimals)
+  amount: 25000,
   orderId: 'order_123',
   description: 'Product purchase',
   callbackUrl: 'https://myapp.com/payment/callback',
 });
 
-// Each gateway returns what it supports:
 console.log(payment.redirectUrl); // ZainCash, QiCard, NassPay
 console.log(payment.qrCode);     // FIB (base64 image)
 console.log(payment.deepLinks);  // FIB (personal/business/corporate)
+```
+
+### Environment Variable Reference
+
+| Gateway | Variable | Description |
+|---------|----------|-------------|
+| ZainCash | `IRAQPAY_ZAINCASH_MSISDN` | Merchant wallet phone number |
+| ZainCash | `IRAQPAY_ZAINCASH_MERCHANT_ID` | Merchant ID from ZainCash dashboard |
+| ZainCash | `IRAQPAY_ZAINCASH_SECRET` | Shared secret for JWT signing |
+| FIB | `IRAQPAY_FIB_CLIENT_ID` | OAuth2 client ID |
+| FIB | `IRAQPAY_FIB_CLIENT_SECRET` | OAuth2 client secret |
+| QiCard | `IRAQPAY_QICARD_USERNAME` | API username |
+| QiCard | `IRAQPAY_QICARD_PASSWORD` | API password |
+| QiCard | `IRAQPAY_QICARD_TERMINAL_ID` | Terminal identifier |
+| NassPay | `IRAQPAY_NASSPAY_USERNAME` | Merchant username |
+| NassPay | `IRAQPAY_NASSPAY_PASSWORD` | Merchant password |
+| General | `IRAQPAY_SANDBOX` | `true` for test environments |
+
+### Explicit Config (Advanced)
+
+For cases where env vars are not suitable (e.g., multi-tenant), you can still pass credentials directly. The SDK will warn in development if credentials appear hardcoded:
+
+```typescript
+const pay = new IraqPay({
+  gateways: {
+    zaincash: {
+      msisdn: tenantConfig.zaincashMsisdn,
+      merchantId: tenantConfig.zaincashMerchantId,
+      secret: tenantConfig.zaincashSecret,
+    },
+  },
+  sandbox: false,
+});
 ```
 
 ## Check Payment Status
@@ -95,16 +163,8 @@ app.post('/payment/webhook', async (req, res) => {
 ### ZainCash
 
 ```typescript
-const pay = new IraqPay({
-  gateways: {
-    zaincash: {
-      msisdn: '9647XXXXXXXXX',     // Merchant wallet number
-      merchantId: 'your_id',        // From ZainCash
-      secret: 'your_secret',        // From ZainCash
-    },
-  },
-  sandbox: true,
-});
+// Set IRAQPAY_ZAINCASH_MSISDN, IRAQPAY_ZAINCASH_MERCHANT_ID, IRAQPAY_ZAINCASH_SECRET
+const pay = IraqPay.fromEnv({ gateways: ['zaincash'], sandbox: true });
 
 const payment = await pay.createPayment({
   gateway: 'zaincash',
@@ -120,15 +180,8 @@ res.redirect(payment.redirectUrl);
 ### FIB (First Iraqi Bank)
 
 ```typescript
-const pay = new IraqPay({
-  gateways: {
-    fib: {
-      clientId: 'your_client_id',
-      clientSecret: 'your_client_secret',
-    },
-  },
-  sandbox: true,
-});
+// Set IRAQPAY_FIB_CLIENT_ID, IRAQPAY_FIB_CLIENT_SECRET
+const pay = IraqPay.fromEnv({ gateways: ['fib'], sandbox: true });
 
 const payment = await pay.createPayment({
   gateway: 'fib',
@@ -153,16 +206,8 @@ await pay.refund(payment.id, 'fib');
 ### QiCard
 
 ```typescript
-const pay = new IraqPay({
-  gateways: {
-    qicard: {
-      username: 'your_username',
-      password: 'your_password',
-      terminalId: 'your_terminal_id',
-    },
-  },
-  sandbox: true,
-});
+// Set IRAQPAY_QICARD_USERNAME, IRAQPAY_QICARD_PASSWORD, IRAQPAY_QICARD_TERMINAL_ID
+const pay = IraqPay.fromEnv({ gateways: ['qicard'], sandbox: true });
 
 const payment = await pay.createPayment({
   gateway: 'qicard',
@@ -185,15 +230,8 @@ res.redirect(payment.redirectUrl);
 ### NassPay
 
 ```typescript
-const pay = new IraqPay({
-  gateways: {
-    nasspay: {
-      username: 'merchant_user',
-      password: 'merchant_pass',
-    },
-  },
-  sandbox: true,
-});
+// Set IRAQPAY_NASSPAY_USERNAME, IRAQPAY_NASSPAY_PASSWORD
+const pay = IraqPay.fromEnv({ gateways: ['nasspay'], sandbox: true });
 
 const payment = await pay.createPayment({
   gateway: 'nasspay',
@@ -229,14 +267,8 @@ await codGateway.markPaid(payment.id);
 ## Multi-Gateway Setup
 
 ```typescript
-const pay = new IraqPay({
-  gateways: {
-    zaincash: { /* ... */ },
-    fib: { /* ... */ },
-    qicard: { /* ... */ },
-    nasspay: { /* ... */ },
-    cod: {},
-  },
+// Set all IRAQPAY_* env vars in .env, then:
+const pay = IraqPay.fromEnv({
   sandbox: true,
   defaultGateway: 'fib',
 });
@@ -303,9 +335,9 @@ Pull requests welcome. For major changes, please open an issue first.
 
 ## Docs
 
-- [التوثيق بالعربي](README-AR.md) — الدليل الكامل بالعربي
+- [README-AR.md](README-AR.md) — full Arabic documentation
 - [Testing Guide (English)](docs/TESTING-GUIDE.md) — how to test locally
-- [دليل التجربة (عربي)](docs/TESTING-GUIDE-AR.md) — شلون تجرّب محلياً
+- [Testing Guide (Arabic)](docs/TESTING-GUIDE-AR.md) — how to test locally
 
 ## Links
 
